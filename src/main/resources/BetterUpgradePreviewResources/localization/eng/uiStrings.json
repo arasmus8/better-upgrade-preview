@@ -1,0 +1,9 @@
+{
+  "BetterUpgradePreview:ModBadge": {
+    "TEXT_DICT": {
+      "MOD_NAME": "Better Upgrades Preview",
+      "MOD_AUTHOUR": "NotInTheFace",
+      "MOD_DESC": "Modifies the upgrade preview to highlight text changes on cards and allow you to see the un-upgraded card for pre-upgraded card rewards."
+    }
+  }
+}
