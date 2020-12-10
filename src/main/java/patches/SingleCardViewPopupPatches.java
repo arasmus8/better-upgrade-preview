@@ -26,7 +26,6 @@ public class SingleCardViewPopupPatches {
                                     SingleCardViewPopup.class,
                                     "card",
                                     currentCard));
-                    // SingleCardViewPopupFields.unupgradedPopupCard.set(_instance, currentCard);
                 }
             }
         }

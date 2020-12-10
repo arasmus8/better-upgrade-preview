@@ -13,5 +13,4 @@ import java.util.ArrayList;
 )
 public class SingleCardViewPopupFields {
     public static SpireField<ArrayList<AbstractCard>> unupgradedCardRewards = new SpireField<>(() -> null);
-    // public static SpireField<AbstractCard> unupgradedPopupCard = new SpireField<AbstractCard>(() -> null);
 }
