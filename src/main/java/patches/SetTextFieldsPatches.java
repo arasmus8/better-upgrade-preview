@@ -160,15 +160,15 @@ public class SetTextFieldsPatches {
                 String[] words = diffTok.split("(?= )|(?<= )", -1);
                 for (String word : words) {
                     if (checkForEnergy(word)) {
-                        ret.add(new DiffToken(false, false, true, word));
+                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
                         continue;
                     }
                     if (checkForDynVar(word)) {
-                        ret.add(new DiffToken(false, false, true, word));
+                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
                         continue;
                     }
                     if (checkForColor(word)) {
-                        ret.add(new DiffToken(false, false, true, word));
+                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
                         continue;
                     }
                     if (checkForNewline(word)) {
