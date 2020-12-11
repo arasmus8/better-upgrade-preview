@@ -1,4 +1,4 @@
-package patches;
+package betterUpgradePreview.patches;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.cards.AbstractCard;

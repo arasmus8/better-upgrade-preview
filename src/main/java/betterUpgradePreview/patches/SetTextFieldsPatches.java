@@ -1,6 +1,7 @@
-package patches;
+package betterUpgradePreview.patches;
 
 import basemod.BaseMod;
+import betterUpgradePreview.ModSettings;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.github.difflib.algorithm.DiffException;
@@ -103,28 +104,6 @@ public class SetTextFieldsPatches {
         return null;
     }
 
-    private static class DiffToken {
-        public boolean isOld;
-        public boolean isNew;
-        public boolean isSpecial;
-        public String value;
-
-        public DiffToken(boolean isOld, boolean isNew, boolean isSpecial, String value) {
-            this.isOld = isOld;
-            this.isNew = isNew;
-            this.isSpecial = isSpecial;
-            this.value = value;
-        }
-
-        public String toString() {
-            return value;
-        }
-
-        public boolean isWhitespace() {
-            return value.matches("\\s+");
-        }
-    }
-
     private static String calculateTextDiff(String original, String upgraded, AbstractCard card) {
         DiffRowGenerator generator = DiffRowGenerator.create()
                 .showInlineDiffs(true)
@@ -205,7 +184,7 @@ public class SetTextFieldsPatches {
                 boolean lastTokWasNL = false;
                 for (DiffToken token : filtered) {
                     if (newWord && token.isNew && !token.isSpecial) {
-                        sb.append("[#7fff00]");
+                        sb.append("[#").append(ModSettings.addColor).append("]");
                         sb.append(token.toString());
                         inColor = true;
                         newWord = false;
@@ -239,7 +218,7 @@ public class SetTextFieldsPatches {
                 boolean inColor = false;
                 for (DiffToken token : ret) {
                     if (newWord && token.isOld && !token.isSpecial) {
-                        sb.append("[#ff6563]");
+                        sb.append("[#").append(ModSettings.removeColor).append("]");
                         sb.append(token.toString());
                         inColor = true;
                         newWord = false;

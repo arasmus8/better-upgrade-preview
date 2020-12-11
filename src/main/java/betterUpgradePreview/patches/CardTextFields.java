@@ -1,4 +1,4 @@
-package patches;
+package betterUpgradePreview.patches;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpireField;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;

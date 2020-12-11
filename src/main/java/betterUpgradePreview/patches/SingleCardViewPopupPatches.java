@@ -1,4 +1,4 @@
-package patches;
+package betterUpgradePreview.patches;
 
 import basemod.ReflectionHacks;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
