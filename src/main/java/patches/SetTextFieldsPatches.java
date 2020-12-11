@@ -128,6 +128,7 @@ public class SetTextFieldsPatches {
     private static String calculateTextDiff(String original, String upgraded, AbstractCard card) {
         DiffRowGenerator generator = DiffRowGenerator.create()
                 .showInlineDiffs(true)
+                .lineNormalizer((s -> s))
                 .mergeOriginalRevised(true)
                 .inlineDiffByWord(true)
                 .oldTag(start -> start ? "@!@OLDSTART@!@" : "@!@OLDEND@!@")
