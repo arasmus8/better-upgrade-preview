@@ -11,8 +11,8 @@ import java.util.ArrayList;
         method = SpirePatch.CLASS
 )
 public class CardTextFields {
-    public static SpireField<String> defaultText = new SpireField<String>(() -> "");
-    public static SpireField<String> upgradedText = new SpireField<String>(() -> "");
-    public static SpireField<String> diffText = new SpireField<String>(() -> "");
-    public static SpireField<ArrayList<String>> diffedKeywords = new SpireField<ArrayList<String>>(() -> null);
+    public static SpireField<String> defaultText = new SpireField<>(() -> "");
+    public static SpireField<String> upgradedText = new SpireField<>(() -> "");
+    public static SpireField<String> diffText = new SpireField<>(() -> "");
+    public static SpireField<ArrayList<String>> diffedKeywords = new SpireField<>(() -> null);
 }

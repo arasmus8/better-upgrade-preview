@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="better-upgrade-preview" />
+        <module name="BetterUpgradePreview" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="better-upgrade-preview" target="1.8" />
+      <module name="BetterUpgradePreview" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
