@@ -5,7 +5,8 @@
       "MOD_AUTHOUR": "NotInTheFace",
       "MOD_DESC": "Modifies the upgrade preview to highlight text changes on cards and allow you to see the un-upgraded card for pre-upgraded card rewards.",
       "REMOVE_LABEL": "Choose a color for text that's removed on upgrade:",
-      "ADD_LABEL": "Choose a color for text that's added or changed on upgrade:"
+      "ADD_LABEL": "Choose a color for text that's added or changed on upgrade:",
+      "TEST": "——————————————————————————————————"
     }
   }
 }

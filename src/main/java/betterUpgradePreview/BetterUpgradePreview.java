@@ -78,8 +78,11 @@ public class BetterUpgradePreview implements
                 //load settings
                 ModSettings.loadSettings();
 
-                p.addUIElement(new ModLabel(uiStrings.TEXT_DICT.get("REMOVE_LABEL"), 380f, 750f, p, (modLabel -> {
-                })));
+                p.addUIElement(new ModLabel(uiStrings.TEXT_DICT.get("REMOVE_LABEL"),
+                        380f,
+                        750f,
+                        p,
+                        (modLabel -> { })));
                 List<Color> removeColors = new ArrayList<>();
                 removeColors.add(new Color(0xFF6563FF));
                 removeColors.add(new Color(0x666666FF));
@@ -110,8 +113,11 @@ public class BetterUpgradePreview implements
                     p.addUIElement(modColorDisplay);
                 }
 
-                p.addUIElement(new ModLabel(uiStrings.TEXT_DICT.get("ADD_LABEL"), 380f, 610f, p, (modLabel -> {
-                })));
+                p.addUIElement(new ModLabel(uiStrings.TEXT_DICT.get("ADD_LABEL"),
+                        380f,
+                        610f,
+                        p,
+                        (modLabel -> { })));
                 List<Color> addColors = new ArrayList<>();
                 addColors.add(new Color(0x7FFF00FF));
                 addColors.add(new Color(0xE1FF00FF));

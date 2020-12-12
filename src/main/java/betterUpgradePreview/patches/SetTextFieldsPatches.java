@@ -60,7 +60,7 @@ public class SetTextFieldsPatches {
     }
 
     private static boolean checkForEnergy(String original) {
-        return checkPattern(original, "(\\[[RGBPE]])");
+        return checkPattern(original, "(\\[[RGBWE]])");
     }
 
     private static boolean checkForDynVar(String original) {
