@@ -4,6 +4,7 @@ import basemod.BaseMod;
 import betterUpgradePreview.ModSettings;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
@@ -25,9 +26,9 @@ public class SetTextFieldsPatches {
     public static class AbstractCardInitializeDescriptionPatch {
         @SpirePostfixPatch
         public static void defaultAndUpgradedText(AbstractCard _instance) {
-            if (_instance.upgraded /*&& "".equals(CardTextFields.upgradedText.get(_instance))*/) {
+            if (_instance.upgraded) {
                 CardTextFields.upgradedText.set(_instance, _instance.rawDescription);
-            } else { // if ("".equals(CardTextFields.defaultText.get(_instance))) {
+            } else {
                 CardTextFields.defaultText.set(_instance, _instance.rawDescription);
             }
         }
@@ -38,7 +39,7 @@ public class SetTextFieldsPatches {
             method = "displayUpgrades"
     )
     public static class AbstractCardDisplayUpgradesPatch {
-        @SpirePostfixPatch
+        @SpirePrefixPatch
         public static void diffText(AbstractCard _instance) {
             String defaultText = CardTextFields.defaultText.get(_instance);
             String upgradedText = CardTextFields.upgradedText.get(_instance);
@@ -105,141 +106,32 @@ public class SetTextFieldsPatches {
     }
 
     private static String calculateTextDiff(String original, String upgraded, AbstractCard card) {
-        DiffRowGenerator generator = DiffRowGenerator.create()
-                .showInlineDiffs(true)
-                .lineNormalizer((s -> s))
-                .mergeOriginalRevised(true)
-                .inlineDiffByWord(true)
-                .oldTag(start -> start ? "@!@OLDSTART@!@" : "@!@OLDEND@!@")
-                .newTag(start -> start ? "@!@DIFFSTART@!@" : "@!@DIFFEND@!@")
-                .build();
         try {
+            DiffRowGenerator generator = DiffRowGenerator.create()
+                    .showInlineDiffs(true)
+                    .lineNormalizer((s -> s))
+                    .mergeOriginalRevised(true)
+                    .inlineDiffByWord(true)
+                    .oldTag(start -> start ? " [DiffRmvS] " : " [DiffRmvE] ")
+                    .newTag(start -> start ? "!RECALC_DIFF!" : "!RECALC_DIFF!")
+                    .build();
             List<DiffRow> rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
             String diffStr = rows.get(0).getOldLine();
-            diffStr = diffStr.replaceAll("[*]@!@DIFFSTART@!@(?=[A-Za-z])", "@!@DIFFSTART@!@*");
-            diffStr = diffStr.replaceAll("[*]@!@OLDSTART@!@(?=[A-Za-z])", "@!@OLDSTART@!@*");
-            String[] diffTokenized = diffStr.split("(?=@!@OLDSTART@!@)|(?<=@!@OLDSTART@!@)|(?<=@!@OLDEND@!@)|(?=@!@OLDEND@!@)|(?=@!@DIFFSTART@!@)|(?<=@!@DIFFSTART@!@)|(?<=@!@DIFFEND@!@)|(?=@!@DIFFEND@!@)", -1);
-            ArrayList<DiffToken> ret = new ArrayList<>();
-            boolean inDiff = false;
-            boolean inOldDiff = false;
-            for (String diffTok : diffTokenized) {
-                switch (diffTok) {
-                    case "@!@DIFFSTART@!@":
-                        inDiff = true;
-                        continue;
-                    case "@!@DIFFEND@!@":
-                        inDiff = false;
-                        continue;
-                    case "@!@OLDSTART@!@":
-                        inOldDiff = true;
-                        continue;
-                    case "@!@OLDEND@!@":
-                        inOldDiff = false;
-                        continue;
-                }
-                String[] words = diffTok.split("(?= )|(?<= )", -1);
-                for (String word : words) {
-                    if (checkForEnergy(word)) {
-                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
-                        continue;
-                    }
-                    if (checkForDynVar(word)) {
-                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
-                        continue;
-                    }
-                    if (checkForColor(word)) {
-                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
-                        continue;
-                    }
-                    if (checkForNewline(word)) {
-                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
-                        continue;
-                    }
-                    if (checkForWhitespace(word)) {
-                        ret.add(new DiffToken(inOldDiff, inDiff, true, word));
-                        continue;
-                    }
-                    if (inDiff || inOldDiff) {
-                        String prefixRemoved = checkForCustomKeyword(word, card);
-                        if (prefixRemoved != null) {
-                            ret.add(new DiffToken(inOldDiff, inDiff, false, prefixRemoved));
-                            continue;
-                        }
-                    }
+            if (diffStr.matches(".*!RECALC_DIFF!.*")) {
+                generator = DiffRowGenerator.create()
+                        .showInlineDiffs(true)
+                        .lineNormalizer((s -> s))
+                        .inlineDiffByWord(true)
+                        .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
+                        .build();
+                rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
+                diffStr = rows.get(0).getNewLine();
+            }
 
-                    String[] withoutPunctuation = word.split("(?!^)\\b", -1);
-                    for (String tok : withoutPunctuation) {
-                        if (tok.length() == 0) {
-                            continue;
-                        }
-                        ret.add(new DiffToken(inOldDiff, inDiff, false, tok));
-                    }
-                }
-            }
-            if (ret.stream().anyMatch(t -> t.isNew)) {
-                StringBuilder sb = new StringBuilder();
-                List<DiffToken> filtered = ret.stream().filter(t -> !t.isOld).collect(Collectors.toList());
-                boolean newWord = true;
-                boolean inColor = false;
-                boolean lastTokWasNL = false;
-                for (DiffToken token : filtered) {
-                    if (newWord && token.isNew && !token.isSpecial) {
-                        sb.append("[#").append(ModSettings.addColor).append("]");
-                        sb.append(token.toString());
-                        inColor = true;
-                        newWord = false;
-                    } else if (token.isWhitespace()) {
-                        if (inColor) {
-                            sb.append("[]");
-                        }
-                        inColor = false;
-                        sb.append(token.toString());
-                        newWord = true;
-                    } else if (token.value.equals("NL")) {
-                        if (!newWord) {
-                            sb.append(" ");
-                        }
-                        sb.append(token.toString());
-                        lastTokWasNL = true;
-                        continue;
-                    } else {
-                        if (lastTokWasNL && !newWord) {
-                            sb.append(" ");
-                        }
-                        sb.append(token.toString());
-                        newWord = false;
-                    }
-                    lastTokWasNL = false;
-                }
-                return sb.toString();
-            } else if (ret.stream().anyMatch(t -> t.isOld)) {
-                StringBuilder sb = new StringBuilder();
-                boolean newWord = true;
-                boolean inColor = false;
-                for (DiffToken token : ret) {
-                    if (newWord && token.isOld && !token.isSpecial) {
-                        sb.append("[#").append(ModSettings.removeColor).append("]");
-                        sb.append(token.toString());
-                        inColor = true;
-                        newWord = false;
-                    } else if (token.isWhitespace()) {
-                        if (inColor) {
-                            sb.append("[]");
-                        }
-                        inColor = false;
-                        sb.append(token.toString());
-                        newWord = true;
-                    } else {
-                        sb.append(token.toString());
-                    }
-                }
-                return sb.toString();
-            } else {
-                return original;
-            }
+            return diffStr.replaceAll(" {2}(?=\\[Diff)", " ").replaceAll("(?<=(Rmv|Add)[SE]]) {2}", " ");
         } catch (DiffException e) {
             e.printStackTrace();
-            return "";
+            return upgraded;
         }
     }
 }

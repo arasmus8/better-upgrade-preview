@@ -58,8 +58,7 @@ public class BetterUpgradePreview implements
                     modColorDisplay.rOutline = Color.GOLDENROD.r;
                     modColorDisplay.gOutline = Color.GOLDENROD.g;
                     modColorDisplay.bOutline = Color.GOLDENROD.b;
-                    Color color = new Color(modColorDisplay.r, modColorDisplay.g, modColorDisplay.b, 1.0f);
-                    ModSettings.removeColor = color.toString().substring(0, 6);
+                    ModSettings.removeColor = new Color(modColorDisplay.r, modColorDisplay.g, modColorDisplay.b, 1.0f);
                     ModSettings.saveSettings();
                 };
                 Consumer<ModColorDisplay> handleAddClick = modColorDisplay -> {
@@ -71,8 +70,7 @@ public class BetterUpgradePreview implements
                     modColorDisplay.rOutline = Color.GOLDENROD.r;
                     modColorDisplay.gOutline = Color.GOLDENROD.g;
                     modColorDisplay.bOutline = Color.GOLDENROD.b;
-                    Color color = new Color(modColorDisplay.r, modColorDisplay.g, modColorDisplay.b, 1.0f);
-                    ModSettings.addColor = color.toString().substring(0, 6);
+                    ModSettings.addColor = new Color(modColorDisplay.r, modColorDisplay.g, modColorDisplay.b, 1.0f);
                     ModSettings.saveSettings();
                 };
                 //load settings

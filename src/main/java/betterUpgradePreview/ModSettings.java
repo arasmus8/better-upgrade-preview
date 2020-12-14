@@ -7,12 +7,11 @@ import java.io.IOException;
 
 public class ModSettings {
     public static SpireConfig config;
-    public static String removeColor = "FF6563";
-    public static String addColor = "7FFF00";
+    public static Color removeColor = new Color(0xFF6563FF);
+    public static Color addColor = new Color(0x7FFF00FF);
 
-    public static boolean colorMatches(Color color, String savedColor) {
-        String asStr = color.toString().substring(0, 6);
-        return asStr.equals(savedColor);
+    public static boolean colorMatches(Color color, Color savedColor) {
+        return savedColor.equals(color);
     }
 
     public static void saveSettings() {
@@ -20,8 +19,8 @@ public class ModSettings {
             // And based on that boolean, set the settings and save them
             config = new SpireConfig("BetterUpgradePreview", "betterUpgradePreviewSettings");
             config.load();
-            config.setString("removeColor", removeColor);
-            config.setString("addColor", addColor);
+            config.setString("removeColor", removeColor.toString());
+            config.setString("addColor", addColor.toString());
             config.save();
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,8 +31,14 @@ public class ModSettings {
         try {
             config = new SpireConfig("BetterUpgradePreview", "betterUpgradePreviewSettings");
             config.load();
-            removeColor = config.getString("removeColor");
-            addColor = config.getString("addColor");
+            String removeColorStr = config.getString("removeColor");
+            if (removeColorStr != null && removeColorStr.length() > 0) {
+                removeColor = new Color(Integer.parseInt(removeColorStr, 16));
+            }
+            String addColorStr = config.getString("addColor");
+            if (addColorStr != null && addColorStr.length() > 0) {
+                addColor = new Color(Integer.parseInt(addColorStr, 16));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
