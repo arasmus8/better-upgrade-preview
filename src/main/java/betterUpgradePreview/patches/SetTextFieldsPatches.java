@@ -1,7 +1,6 @@
 package betterUpgradePreview.patches;
 
 import basemod.BaseMod;
-import betterUpgradePreview.ModSettings;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class SetTextFieldsPatches {
     @SpirePatch(
@@ -27,9 +25,9 @@ public class SetTextFieldsPatches {
         @SpirePostfixPatch
         public static void defaultAndUpgradedText(AbstractCard _instance) {
             if (_instance.upgraded) {
-                CardTextFields.upgradedText.set(_instance, _instance.rawDescription);
+                AbstractCardFields.upgradedText.set(_instance, _instance.rawDescription);
             } else {
-                CardTextFields.defaultText.set(_instance, _instance.rawDescription);
+                AbstractCardFields.defaultText.set(_instance, _instance.rawDescription);
             }
         }
     }
@@ -41,14 +39,14 @@ public class SetTextFieldsPatches {
     public static class AbstractCardDisplayUpgradesPatch {
         @SpirePrefixPatch
         public static void diffText(AbstractCard _instance) {
-            String defaultText = CardTextFields.defaultText.get(_instance);
-            String upgradedText = CardTextFields.upgradedText.get(_instance);
-            if ("".equals(CardTextFields.diffText.get(_instance)) && !defaultText.equals(upgradedText) && !"".equals(upgradedText)) {
+            String defaultText = AbstractCardFields.defaultText.get(_instance);
+            String upgradedText = AbstractCardFields.upgradedText.get(_instance);
+            if ("".equals(AbstractCardFields.diffText.get(_instance)) && !defaultText.equals(upgradedText) && !"".equals(upgradedText)) {
                 String diffText = calculateTextDiff(defaultText, upgradedText, _instance);
-                CardTextFields.diffText.set(_instance, diffText);
+                AbstractCardFields.diffText.set(_instance, diffText);
             }
-            if (!"".equals(CardTextFields.diffText.get(_instance))) {
-                _instance.rawDescription = CardTextFields.diffText.get(_instance);
+            if (!"".equals(AbstractCardFields.diffText.get(_instance))) {
+                _instance.rawDescription = AbstractCardFields.diffText.get(_instance);
                 _instance.initializeDescription();
             }
         }
@@ -91,12 +89,12 @@ public class SetTextFieldsPatches {
             modified = parentKeyword;
             if (GameDictionary.keywords.containsKey(modified)) {
                 if (BaseMod.keywordIsUnique(modified)) {
-                    ArrayList<String> diffKeywords = CardTextFields.diffedKeywords.get(card);
+                    ArrayList<String> diffKeywords = AbstractCardFields.diffedKeywords.get(card);
                     if (diffKeywords == null) {
                         diffKeywords = new ArrayList<>();
                     }
                     diffKeywords.add(modified);
-                    CardTextFields.diffedKeywords.set(card, diffKeywords);
+                    AbstractCardFields.diffedKeywords.set(card, diffKeywords);
                     String prefix = BaseMod.getKeywordPrefix(modified);
                     return word.replaceFirst(prefix, "");
                 }

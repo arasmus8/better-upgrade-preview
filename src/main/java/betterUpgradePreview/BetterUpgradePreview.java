@@ -45,6 +45,8 @@ public class BetterUpgradePreview implements
         try {
             UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ModBadge"));
             Texture modBadge = new Texture(modId + "Resources/badge.png");
+            //load settings
+            ModSettings.loadSettings();
 
             ModPanel settingsPanel = new ModPanel(p -> {
                 Texture colorButton = new Texture(modId + "Resources/colorButton.png");
@@ -73,8 +75,6 @@ public class BetterUpgradePreview implements
                     ModSettings.addColor = new Color(modColorDisplay.r, modColorDisplay.g, modColorDisplay.b, 1.0f);
                     ModSettings.saveSettings();
                 };
-                //load settings
-                ModSettings.loadSettings();
 
                 p.addUIElement(new ModLabel(uiStrings.TEXT_DICT.get("REMOVE_LABEL"),
                         380f,

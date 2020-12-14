@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class ModSettings {
     public static SpireConfig config;
@@ -33,11 +34,11 @@ public class ModSettings {
             config.load();
             String removeColorStr = config.getString("removeColor");
             if (removeColorStr != null && removeColorStr.length() > 0) {
-                removeColor = new Color(Integer.parseInt(removeColorStr, 16));
+                removeColor = Color.valueOf(removeColorStr);
             }
             String addColorStr = config.getString("addColor");
             if (addColorStr != null && addColorStr.length() > 0) {
-                addColor = new Color(Integer.parseInt(addColorStr, 16));
+                addColor = Color.valueOf(addColorStr);
             }
         } catch (IOException e) {
             e.printStackTrace();

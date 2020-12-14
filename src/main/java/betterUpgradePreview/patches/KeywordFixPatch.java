@@ -16,7 +16,7 @@ public class KeywordFixPatch {
             locator = KeywordFixPatchLocator.class
     )
     public static void UpgradeDiffKeywordFix(AbstractCard _instance) {
-        ArrayList<String> savedKeywords = CardTextFields.diffedKeywords.get(_instance);
+        ArrayList<String> savedKeywords = AbstractCardFields.diffedKeywords.get(_instance);
         if (savedKeywords != null) {
             _instance.keywords.addAll(savedKeywords);
             savedKeywords.clear();
