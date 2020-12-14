@@ -123,20 +123,10 @@ public class SetTextFieldsPatches {
                     .mergeOriginalRevised(true)
                     .inlineDiffBySplitter(splitter)
                     .oldTag(start -> start ? " [DiffRmvS] " : " [DiffRmvE] ")
-                    .newTag(start -> start ? "!RECALC_DIFF!" : "!RECALC_DIFF!")
+                    .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
                     .build();
             List<DiffRow> rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
             String diffStr = rows.get(0).getOldLine();
-            if (diffStr.matches(".*!RECALC_DIFF!.*")) {
-                generator = DiffRowGenerator.create()
-                        .showInlineDiffs(true)
-                        .lineNormalizer((s -> s))
-                        .inlineDiffBySplitter(splitter)
-                        .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
-                        .build();
-                rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
-                diffStr = rows.get(0).getNewLine();
-            }
 
             return diffStr.replaceAll(" {2}(?=\\[Diff)", " ").replaceAll("(?<=(Rmv|Add)[SE]]) {2}", " ");
         } catch (DiffException e) {
