@@ -138,6 +138,9 @@ public class CardTextRenderPatches {
             }
         }
 
+        /*
+         * Replace the color parameter of FontHelper.renderRotatedText with the proper color based on the diff state
+         */
         @SpireInstrumentPatch
         public static ExprEditor Instrument() {
             return new ExprEditor() {

@@ -11,8 +11,10 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.helpers.GameDictionary;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,11 +107,21 @@ public class SetTextFieldsPatches {
 
     private static String calculateTextDiff(String original, String upgraded, AbstractCard card) {
         try {
+            Function<String, List<String>> splitter = line -> {
+                List<String> ret = new ArrayList<>();
+                if (line != null) {
+                    String[] words = line.split("\\s+");
+                    for (String word : words) {
+                        ret.add(word + " ");
+                    }
+                }
+                return ret;
+            };
             DiffRowGenerator generator = DiffRowGenerator.create()
                     .showInlineDiffs(true)
                     .lineNormalizer((s -> s))
                     .mergeOriginalRevised(true)
-                    .inlineDiffByWord(true)
+                    .inlineDiffBySplitter(splitter)
                     .oldTag(start -> start ? " [DiffRmvS] " : " [DiffRmvE] ")
                     .newTag(start -> start ? "!RECALC_DIFF!" : "!RECALC_DIFF!")
                     .build();
@@ -119,7 +131,7 @@ public class SetTextFieldsPatches {
                 generator = DiffRowGenerator.create()
                         .showInlineDiffs(true)
                         .lineNormalizer((s -> s))
-                        .inlineDiffByWord(true)
+                        .inlineDiffBySplitter(splitter)
                         .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
                         .build();
                 rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
