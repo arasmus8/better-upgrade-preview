@@ -80,7 +80,8 @@ public class BetterUpgradePreview implements
                         380f,
                         750f,
                         p,
-                        (modLabel -> { })));
+                        (modLabel -> {
+                        })));
                 List<Color> removeColors = new ArrayList<>();
                 removeColors.add(new Color(0xFF6563FF));
                 removeColors.add(new Color(0x666666FF));
@@ -115,7 +116,8 @@ public class BetterUpgradePreview implements
                         380f,
                         610f,
                         p,
-                        (modLabel -> { })));
+                        (modLabel -> {
+                        })));
                 List<Color> addColors = new ArrayList<>();
                 addColors.add(new Color(0x7FFF00FF));
                 addColors.add(new Color(0xE1FF00FF));

@@ -73,7 +73,7 @@ public class CardTextRenderPatches {
         }
     }
 
-    public static class AlterDescriptionRenderingPatchLocator2 extends SpireInsertLocator {
+    public static class CardDescriptionStrikethroughLocator extends SpireInsertLocator {
         @Override
         public int[] Locate(CtBehavior ctBehavior) throws Exception {
             Matcher matcher = new Matcher.FieldAccessMatcher(GlyphLayout.class, "width");
@@ -112,18 +112,16 @@ public class CardTextRenderPatches {
         }
 
         @SpireInsertPatch(
-                locator = AlterDescriptionRenderingPatchLocator2.class,
-                localvars = {"font", "tmp", "i", "start_x", "gl", "draw_y", "spacing"}
+                locator = CardDescriptionStrikethroughLocator.class,
+                localvars = {"font", "i", "start_x", "gl", "draw_y"}
         )
         public static void Strikethrough(AbstractCard _instance,
                                          SpriteBatch sb,
                                          BitmapFont font,
-                                         String tmp,
                                          int i,
                                          float start_x,
                                          GlyphLayout gl,
-                                         float draw_y,
-                                         float spacing) {
+                                         float draw_y) {
             if (AbstractCardFields.isInDiffRmv.get(_instance)) {
                 float w = gl.width;
                 Color original = sb.getColor();
@@ -149,31 +147,31 @@ public class CardTextRenderPatches {
                             m.getMethodName().equals("renderRotatedText")) {
                         m.replace("{ $10 = " +
                                 CardTextRenderPatches.class.getName() +
-                                ".GetColor(this); $_ = $proceed($$); }");
+                                ".GetColor(this, $10); $_ = $proceed($$); }");
                     }
                 }
             };
         }
     }
 
-    public static Color GetColor(AbstractCard _instance) {
+    public static Color GetColor(AbstractCard _instance, Color originalColor) {
         if (AbstractCardFields.isInDiffAdd.get(_instance)) {
             return ModSettings.addColor;
         } else if (AbstractCardFields.isInDiffRmv.get(_instance)) {
             return ModSettings.removeColor;
         } else {
-            return ReflectionHacks.getPrivate(_instance, AbstractCard.class, "textColor");
+            return originalColor;
         }
     }
 
-    public static Color GetColorSCVP(SingleCardViewPopup _instance) {
+    public static Color GetColorSCVP(SingleCardViewPopup _instance, Color originalColor) {
         AbstractCard card = ReflectionHacks.getPrivate(_instance, SingleCardViewPopup.class, "card");
         if (AbstractCardFields.isInDiffAdd.get(card)) {
             return ModSettings.addColor;
         } else if (AbstractCardFields.isInDiffRmv.get(card)) {
             return ModSettings.removeColor;
         } else {
-            return Settings.CREAM_COLOR;
+            return originalColor;
         }
     }
 
@@ -191,23 +189,20 @@ public class CardTextRenderPatches {
                             m.getMethodName().equals("renderRotatedText")) {
                         m.replace("{ $10 = " +
                                 CardTextRenderPatches.class.getName() +
-                                ".GetColorSCVP(this); $_ = $proceed($$); }");
+                                ".GetColorSCVP(this, $10); $_ = $proceed($$); }");
                     }
                 }
             };
         }
 
         @SpireInsertPatch(
-                locator = AlterBigDescriptionRenderingPatchLocator2.class,
-                localvars = {"font", "tmp", "i", "start_x", "gl", "draw_y"}
+                locator = BigDescriptionStrikethroughLocator.class,
+                localvars = {"font", "i", "start_x", "gl", "draw_y"}
         )
         public static void Strikethrough(SingleCardViewPopup _instance,
                                          SpriteBatch sb,
-                                         float ___current_x,
-                                         float ___current_y,
                                          AbstractCard ___card,
                                          BitmapFont font,
-                                         String tmp,
                                          int i,
                                          float start_x,
                                          GlyphLayout gl,
@@ -259,7 +254,7 @@ public class CardTextRenderPatches {
         }
     }
 
-    public static class AlterBigDescriptionRenderingPatchLocator2 extends SpireInsertLocator {
+    public static class BigDescriptionStrikethroughLocator extends SpireInsertLocator {
         @Override
         public int[] Locate(CtBehavior ctBehavior) throws Exception {
             Matcher matcher = new Matcher.FieldAccessMatcher(GlyphLayout.class, "width");

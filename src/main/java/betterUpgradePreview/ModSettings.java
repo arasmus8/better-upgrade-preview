@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 
 import java.io.IOException;
-import java.util.Locale;
 
 public class ModSettings {
     public static SpireConfig config;
