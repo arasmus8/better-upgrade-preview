@@ -8,6 +8,7 @@ import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.GameDictionary;
 
 import java.util.ArrayList;
@@ -65,28 +66,34 @@ public class SetTextFieldsPatches {
                 }
                 return ret;
             };
-            DiffRowGenerator generator = DiffRowGenerator.create()
+            DiffRowGenerator.Builder builder = DiffRowGenerator.create()
                     .showInlineDiffs(true)
                     .lineNormalizer((s -> s))
                     .mergeOriginalRevised(true)
-                    .inlineDiffBySplitter(splitter)
-                    .oldTag(start -> start ? " [DiffRmvS] " : " [DiffRmvE] ")
-                    .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
-                    .build();
+                    .oldTag(start -> start ? " [diffRmvS] " : " [diffRmvE] ")
+                    .newTag(start -> start ? " [diffAddS] " : " [diffAddE] ");
+            // Use default splitter for chinese/japanese, as they don't use spaces in card descriptions
+            if (!Settings.lineBreakViaCharacter) {
+                builder.inlineDiffBySplitter(splitter);
+            }
+            DiffRowGenerator generator = builder.build();
             List<DiffRow> rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
             String diffStr = rows.get(0).getOldLine();
-            if (diffStr.matches(".*DiffAdd.*")) {
-                generator = DiffRowGenerator.create()
+            if (diffStr.matches(".*diffAdd.*")) {
+                builder = DiffRowGenerator.create()
                         .showInlineDiffs(true)
                         .lineNormalizer((s -> s))
-                        .inlineDiffBySplitter(splitter)
-                        .newTag(start -> start ? " [DiffAddS] " : " [DiffAddE] ")
-                        .build();
+                        .newTag(start -> start ? " [diffAddS] " : " [diffAddE] ");
+                // Use default splitter for chinese/japanese, as they don't use spaces in card descriptions
+                if (!Settings.lineBreakViaCharacter) {
+                    builder.inlineDiffBySplitter(splitter);
+                }
+                generator = builder.build();
                 rows = generator.generateDiffRows(Collections.singletonList(original), Collections.singletonList(upgraded));
                 diffStr = rows.get(0).getNewLine();
             }
 
-            return diffStr.replaceAll(" {2}(?=\\[Diff)", " ").replaceAll("(?<=(Rmv|Add)[SE]]) {2}", " ");
+            return diffStr.replaceAll(" {2}(?=\\[diff)", " ").replaceAll("(?<=(Rmv|Add)[SE]]) {2}", " ");
         } catch (DiffException e) {
             e.printStackTrace();
             return upgraded;

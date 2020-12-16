@@ -44,10 +44,10 @@ public class CardTextRenderPatches {
         )
         public static void Insert(AbstractCard _instance, @ByRef GlyphLayout[] gl, String word) {
             if (word.length() > 0 && word.charAt(0) == '[') {
-                if (word.equals("[DiffAddS]") ||
-                        word.equals("[DiffAddE]") ||
-                        word.equals("[DiffRmvS]") ||
-                        word.equals("[DiffRmvE]")
+                if (word.equals("[diffAddS]") ||
+                        word.equals("[diffAddE]") ||
+                        word.equals("[diffRmvS]") ||
+                        word.equals("[diffRmvE]")
                 ) {
                     gl[0].setText(FontHelper.cardDescFont_N, "");
                     gl[0].width = 0;
@@ -86,44 +86,35 @@ public class CardTextRenderPatches {
             clz = AbstractCard.class,
             method = "renderDescription"
     )
+    @SpirePatch(
+            clz = AbstractCard.class,
+            method = "renderDescriptionCN"
+    )
     public static class AlterDescriptionRenderingPatch {
-        private static Color original = null;
-
         @SpireInsertPatch(
                 locator = AlterDescriptionRenderingPatchLocator.class,
                 localvars = {"tmp"}
         )
         public static void Insert(AbstractCard _instance, SpriteBatch sb, @ByRef String[] tmp) {
-            if (tmp[0].length() > 0 && tmp[0].charAt(0) == '[') {
-                if (tmp[0].equals("[DiffAddS] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffAdd.set(_instance, true);
-                } else if (tmp[0].equals("[DiffAddE] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffAdd.set(_instance, false);
-                } else if (tmp[0].equals("[DiffRmvS] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffRmv.set(_instance, true);
-                } else if (tmp[0].equals("[DiffRmvE] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffRmv.set(_instance, false);
-                }
-            }
+            captureTags(_instance, tmp);
         }
 
         @SpireInsertPatch(
                 locator = CardDescriptionStrikethroughLocator.class,
-                localvars = {"font", "i", "start_x", "gl", "draw_y"}
+                localvars = {"font", "tmp", "i", "start_x", "gl", "draw_y"}
         )
         public static void Strikethrough(AbstractCard _instance,
                                          SpriteBatch sb,
                                          BitmapFont font,
+                                         String tmp,
                                          int i,
                                          float start_x,
                                          GlyphLayout gl,
                                          float draw_y) {
             if (AbstractCardFields.isInDiffRmv.get(_instance)) {
+                gl.setText(font, tmp.trim());
                 float w = gl.width;
+                gl.setText(font, tmp);
                 Color original = sb.getColor();
                 sb.setColor(ModSettings.removeColor);
                 sb.draw(strikethrough,
@@ -179,6 +170,10 @@ public class CardTextRenderPatches {
             clz = SingleCardViewPopup.class,
             method = "renderDescription"
     )
+    @SpirePatch(
+            clz = SingleCardViewPopup.class,
+            method = "renderDescriptionCN"
+    )
     public static class AlterBigDescriptionRenderingPatch {
 
         @SpireInstrumentPatch
@@ -197,18 +192,21 @@ public class CardTextRenderPatches {
 
         @SpireInsertPatch(
                 locator = BigDescriptionStrikethroughLocator.class,
-                localvars = {"font", "i", "start_x", "gl", "draw_y"}
+                localvars = {"font", "tmp", "i", "start_x", "gl", "draw_y"}
         )
         public static void Strikethrough(SingleCardViewPopup _instance,
                                          SpriteBatch sb,
                                          AbstractCard ___card,
                                          BitmapFont font,
+                                         String tmp,
                                          int i,
                                          float start_x,
                                          GlyphLayout gl,
                                          float draw_y) {
             if (AbstractCardFields.isInDiffRmv.get(___card)) {
+                gl.setText(font, tmp.trim());
                 float w = gl.width;
+                gl.setText(font, tmp);
                 Color original = sb.getColor();
                 sb.setColor(ModSettings.removeColor);
                 sb.draw(strikethrough,
@@ -227,21 +225,7 @@ public class CardTextRenderPatches {
         )
         public static void Insert(SingleCardViewPopup _instance, SpriteBatch sb, @ByRef String[] tmp) {
             AbstractCard card = ReflectionHacks.getPrivate(_instance, SingleCardViewPopup.class, "card");
-            if (tmp[0].length() > 0 && tmp[0].charAt(0) == '[') {
-                if (tmp[0].equals("[DiffAddS] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffAdd.set(card, true);
-                } else if (tmp[0].equals("[DiffAddE] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffAdd.set(card, false);
-                } else if (tmp[0].equals("[DiffRmvS] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffRmv.set(card, true);
-                } else if (tmp[0].equals("[DiffRmvE] ")) {
-                    tmp[0] = "";
-                    AbstractCardFields.isInDiffRmv.set(card, false);
-                }
-            }
+            captureTags(card, tmp);
         }
     }
 
@@ -263,4 +247,21 @@ public class CardTextRenderPatches {
         }
     }
 
+    private static void captureTags(AbstractCard _instance, @ByRef String[] tmp) {
+        if (tmp[0].length() > 0 && tmp[0].charAt(0) == '[') {
+            if (tmp[0].equals("[diffAddS] ") || tmp[0].equals("[diffAddS]")) {
+                tmp[0] = "";
+                AbstractCardFields.isInDiffAdd.set(_instance, true);
+            } else if (tmp[0].equals("[diffAddE] ") || tmp[0].equals("[diffAddE]")) {
+                tmp[0] = "";
+                AbstractCardFields.isInDiffAdd.set(_instance, false);
+            } else if (tmp[0].equals("[diffRmvS] ") || tmp[0].equals("[diffRmvS]")) {
+                tmp[0] = "";
+                AbstractCardFields.isInDiffRmv.set(_instance, true);
+            } else if (tmp[0].equals("[diffRmvE] ") || tmp[0].equals("[diffRmvE]")) {
+                tmp[0] = "";
+                AbstractCardFields.isInDiffRmv.set(_instance, false);
+            }
+        }
+    }
 }
